@@ -1,8 +1,10 @@
-# Text Alignment using Levenshtein Distance
-# April 4, 2019 - Adam Rule
+# Sequence Alignment using Levenshtein Distance
+# March 4, 2019 - Adam Rule
 
 # See https://www.ncbi.nlm.nih.gov/pubmed/20064801 for algorithmic details
 # requires nltk data be downloaded
+
+# TODO: Use another method to tokenize strings to remove NLTK dependency
 
 
 import nltk
@@ -11,36 +13,51 @@ import numpy as np
 name = "text_align"
 
 def calculate_redundancy(a, b):
-	""" Calculate the redundnacy, or overlap, between two lists using sequence alignment
+	""" Calculate the redundnacy between two lists using sequence alignment
 
 		Parameters:
 		a: str - String of text
 		b: str - String of text
 
 		Return:
-		redundancy: float - proportion of second sequence that overlaps with the first """
-
-	# tokenize the files so they become arrays of individual words and punctuation
-	token_a = nltk.tokenize.word_tokenize(a)
-	token_b = nltk.tokenize.word_tokenize(b)
-
-	# remove common punctuation
-	token_a = [x for x in token_a if x not in ['.', ',', ':', ';', '(', ')', '?', '!']]
-	token_b = [x for x in token_b if x not in ['.', ',', ':', ';', '(', ')', '?', '!']]
+		redundancy: float - proportion of words in b that overlap with a """
 
 	# And the overlap is...
+	token_a, token_b = tokenize_text(a, b)
 	seq, seq_a, seq_b = levenshtein(token_a, token_b)
 	redundancy = np.dot(seq_a, seq_b) / len(token_b)
 
 	return redundancy
 
 
-def levenshtein(a, b, sub_cost = 1000000, gap_cost = 1):
+def tokenize_text(a, b):
+	""" Tokenize a string of words into a list of words
+
+		Parameters:
+		a: str - String of text
+		b: str - String of text
+
+		Return:
+		token_a: list - tokenized words
+		token_b: list - tokenized words """
+
+	# tokenize the files so they become arrays of individual words and punctuation
+	token_a = nltk.tokenize.word_tokenize(a)
+	token_b = nltk.tokenize.word_tokenize(b)
+
+	# remove common punctuation
+	ignore_tokens = ['.', ',', ':', ';', '(', ')', '?', '!']
+	token_a = [x for x in token_a if x not in ignore_tokens]
+	token_b = [x for x in token_b if x not in ignore_tokens]
+
+	return token_a, token_b
+
+def levenshtein(token_a, token_b, sub_cost = 1000000, gap_cost = 1):
 	""" Align two sequences of words using Levenshtein distance
 
 		Parameters:
-		a: list - most likely chars or strings
-		b: list - most likely chars or strings
+		token_a: list - most likely chars or strings
+		token_b: list - most likely chars or strings
 		sub_cost: int - cost of substituting items
 		gap_cost: int - cost of deleting or inserting items
 
@@ -49,8 +66,8 @@ def levenshtein(a, b, sub_cost = 1000000, gap_cost = 1):
 		seq_a: list - binary flags showing which parts of seq align with a
 		seq_b: list - binary flags showing which parts of seq align with b """
 
-	score = levenshtein_score(a, b, sub_cost, gap_cost)
-	seq, seq_a, seq_b = levenshtein_align(a, b, score)
+	score = levenshtein_score(token_a, token_b, sub_cost, gap_cost)
+	seq, seq_a, seq_b = levenshtein_align(token_a, token_b, score)
 
 	return seq, seq_a, seq_b
 
