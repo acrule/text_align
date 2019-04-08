@@ -45,10 +45,9 @@ def tokenize_text(a, b):
 	token_a = nltk.tokenize.word_tokenize(a)
 	token_b = nltk.tokenize.word_tokenize(b)
 
-	# remove common punctuation
-	ignore_tokens = ['.', ',', ':', ';', '(', ')', '?', '!']
-	token_a = [x for x in token_a if x not in ignore_tokens]
-	token_b = [x for x in token_b if x not in ignore_tokens]
+	# only include words with at least one number or letter
+	token_a = [x for x in token_a if re.search('[a-zA-Z0-9]', x)]
+	token_b = [x for x in token_b if re.search('[a-zA-Z0-9]', x)]
 
 	return token_a, token_b
 
