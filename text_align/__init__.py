@@ -6,7 +6,7 @@
 
 # TODO: Use another method to tokenize strings to remove NLTK dependency
 
-
+import re
 import nltk
 import numpy as np
 
